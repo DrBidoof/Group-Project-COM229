@@ -8,6 +8,7 @@ import morgan from "morgan";
 import path from "path";
 import multer from "multer";
 import { fileURLToPath } from "url";
+import { register  } from "./controllers/auth.js";
 
 
 
@@ -47,3 +48,6 @@ const client = new MongoClient(Dbconnect);
 client.connect().then(() =>{
     app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
 }).catch((error) => console.log(`${error} did not connect`)) 
+
+/* Routes with files */
+app.post("/auth/register", upload.single("picture"), register);
