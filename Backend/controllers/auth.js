@@ -1,13 +1,13 @@
 import bcrypt from "bcrypt";
+import { MongoClient } from "mongodb";
 import jwt from "jsonwebtoken";
-
 
 
 const validateUser = (user) => {
     const errors = [];
     
     // Check required fields
-    if (!user.firstNmae || user.firstNmae.length < 2 || user.firstNmae.length > 50) {
+    if (!user.firstName || user.firstName.length < 2 || user.firstName.length > 50) {
         errors.push("First name must be between 2 and 50 characters.");
     }
     if (!user.lastName || user.lastName.length < 2 || user.lastName.length > 50) {
@@ -40,12 +40,12 @@ const validateUser = (user) => {
     return errors;
 };
 
-export const register = async (req, res) => {
+export const register = async (req, res, client, dbName) => {
     try {
         const salt = await bcrypt.genSalt();
         const passwordHash = await bcrypt.hash(req.body.password, salt)
         const User = {
-            firstNmae: req.body.firstNmae,
+            firstName: req.body.firstName, 
             lastName: req.body.lastName,
             password: passwordHash,
             email:req.body.email,
@@ -60,16 +60,32 @@ export const register = async (req, res) => {
         //error checking for user object 
         const errors = validateUser(User);
         if(errors.length >0){
+            //console.log(User.firstNmae, User.lastName, User.email, User.location, User.occupation);
+            console.log(req.body.firstName);
             return res.status(400).json({ errors });
         }
-        // connectiong to mongo db 
+        // connectiong to mongo db
         const database = client.db(dbName);
         const collection = database.collection("Users");
+        // logic to check for duplicate emails
+
+
         const result = await collection.insertOne(User);
         console.log(`Document inserted with _id: ${result.insertedId}`);
         res.status(201).json({ message: "User registered successfully!"});
     } catch(err) {
         console.error("Error inserting document:", err);
         res.status(500).json({error: "Internal server error."});
+    } finally{
+       
     }
 };
+
+
+/*
+     Check if email already exists
+        const existingUser = await collection.findOne({ email: User.email });
+        if (existingUser) {
+            return res.status(400).json({ error: "Email already in use." });
+        }
+*/

@@ -51,4 +51,6 @@ client.connect().then(() =>{
 }).catch((error) => console.log(`${error} did not connect`)) 
 
 /* Routes with files */
-app.post("/auth/register", upload.single("picture"), register);
+app.post("/auth/register", upload.single("picture"), (req,res) =>{
+    register(req,res,client,dbName);
+});
