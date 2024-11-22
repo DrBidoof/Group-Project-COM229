@@ -45,7 +45,8 @@ const Dbconnect = process.env.connect;
 const PORT =  process.env.PORT || 6001;
 
 const client = new MongoClient(Dbconnect);
-const dbName = "comp229week2";
+const dbName = "Social_Media_App";
+
 client.connect().then(() =>{
     app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
 }).catch((error) => console.log(`${error} did not connect`)) 
