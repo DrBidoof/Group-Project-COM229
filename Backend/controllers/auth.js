@@ -88,4 +88,10 @@ export const register = async (req, res, client, dbName) => {
         if (existingUser) {
             return res.status(400).json({ error: "Email already in use." });
         }
+        
 */
+
+// LOGGIN LOGIC GOES BELOW HERE
+export const login = async (req,res) => {
+    
+}

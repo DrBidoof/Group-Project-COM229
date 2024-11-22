@@ -9,6 +9,7 @@ import path from "path";
 import multer from "multer";
 import { fileURLToPath } from "url";
 import { register } from "./controllers/auth.js";
+import authRoutes from "./routes/auth.js";
 
 
 // node app.js or nodemon 
@@ -55,3 +56,6 @@ client.connect().then(() =>{
 app.post("/auth/register", upload.single("picture"), (req,res) =>{
     register(req,res,client,dbName);
 });
+
+/*ROUTES*/
+app.use("/auth", authRoutes)
