@@ -1,6 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
-import { MongoClient } from "mongodb"; //i will be using Mongo just like in class
+import { MongoClient } from "mongodb";
 import cors from "cors";
 import dotenv from "dotenv";
 import helmet from "helmet";
@@ -8,10 +8,10 @@ import morgan from "morgan";
 import path from "path";
 import multer from "multer";
 import { fileURLToPath } from "url";
-import { register  } from "./controllers/auth.js";
+import { register } from "./controllers/auth.js";
 
 
-
+// node app.js or nodemon 
 
 /* Configuratuons */
 
