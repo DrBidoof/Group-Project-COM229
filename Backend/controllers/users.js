@@ -1,5 +1,3 @@
-//hello
-
 import { MongoClient } from "mongodb";
 
 export const getUser = async (req, res) => {
