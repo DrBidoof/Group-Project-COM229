@@ -60,4 +60,4 @@ app.post("/auth/register", upload.single("picture"), (req,res) =>{
 
 /*ROUTES*/
 app.use("/auth", authRoutes);
-app.use("/users", userRoutes);
+app.use("/users", userRoutes(client,dbName));
