@@ -1,4 +1,3 @@
-import { MongoClient } from "mongodb";
 
 export const getUser = async (req,res,client,dbName) => {
     try{

@@ -11,6 +11,9 @@ import { fileURLToPath } from "url";
 import { register } from "./controllers/auth.js";
 import authRoutes from "./routes/auth.js";
 import userRoutes from  "./routes/users.js";
+import postRoutes from "./routes/posts.js";
+import { verifyToken } from "./middleware/auth.js";
+import { createPost } from "./controllers/posts.js";
 
 
 // node app.js or nodemon 
@@ -57,7 +60,13 @@ client.connect().then(() =>{
 app.post("/auth/register", upload.single("picture"), (req,res) =>{
     register(req,res,client,dbName);
 });
+app.post("/posts", verifyToken, upload.single("picture"),  (req,res)=> 
+{
+    createPost(req,res,client,dbName);
+});
+
 
 /*ROUTES*/
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes(client,dbName));
+app.use("/posts", postRoutes);
