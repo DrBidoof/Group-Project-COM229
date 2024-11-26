@@ -1,7 +1,7 @@
 
 export const getUser = async (req,res,client,dbName) => {
     try{
-
+            //YOUR LOGIC GOES HERE //client AND dbName is for your connection to mongodb
     } catch(err){
         res.status(404).json({ message: err.message });
     }
