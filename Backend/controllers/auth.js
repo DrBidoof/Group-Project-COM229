@@ -92,6 +92,6 @@ export const register = async (req, res, client, dbName) => {
 */
 
 // LOGGIN LOGIC GOES BELOW HERE
-export const login = async (req,res) => {
+export const login = async (req, res, client, dbName) => {
     
 }

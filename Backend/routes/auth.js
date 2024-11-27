@@ -3,6 +3,9 @@ import { login } from "../controllers/auth.js";
 
 const router = express.Router();
 
-router.post("/login", login);
+export default (client, dbName) => {
 
-export default router;
+    router.post("/login", (req, res) => login(req, res, client, dbName));
+
+    return router;
+}

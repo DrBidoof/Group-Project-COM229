@@ -67,6 +67,6 @@ app.post("/posts", verifyToken, upload.single("picture"),  (req,res)=>
 
 
 /*ROUTES*/
-app.use("/auth", authRoutes);
+app.use("/auth", authRoutes(client,dbName));
 app.use("/users", userRoutes(client,dbName));
 app.use("/posts", postRoutes(client,dbName));
