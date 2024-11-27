@@ -3,6 +3,7 @@ import { MongoClient } from "mongodb";
 import jwt from "jsonwebtoken";
 
 
+
 const validateUser = (user) => {
     const errors = [];
     
@@ -40,7 +41,7 @@ const validateUser = (user) => {
     return errors;
 };
 
-export const register = async (req, res, client, dbName) => {
+/*export const register = async (req, res, client, dbName) => {
     try {
         const salt = await bcrypt.genSalt();
         const passwordHash = await bcrypt.hash(req.body.password, salt)
@@ -79,7 +80,7 @@ export const register = async (req, res, client, dbName) => {
     } finally{
        
     }
-};
+};/*
 
 
 /*
@@ -91,7 +92,102 @@ export const register = async (req, res, client, dbName) => {
         
 */
 
+export const register = async (req, res, client, dbName) => {
+    try {
+        const salt = await bcrypt.genSalt();
+        const passwordHash = await bcrypt.hash(req.body.password, salt);
+
+        const User = {
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            password: passwordHash,
+            email: req.body.email,
+            picturePath: req.file ? req.file.filename : "", // Capture the uploaded file's name
+            location: req.body.location || "",
+            occupation: req.body.occupation || "",
+            friends: [],
+            viewedProfile: 0,
+            impressions: 0,
+            createdAt: new Date(),
+        };
+
+        
+        // Connect to MongoDB
+        const database = client.db(dbName);
+        const collection = database.collection("Users");
+
+        // Check if email already exists
+        const existingUser = await collection.findOne({ email: User.email });
+        if (existingUser) {
+            return res.status(400).json({ error: "Email already in use." });
+        }
+
+        //error checking for user object 
+        const errors = validateUser(User);
+        if(errors.length >0){
+            //console.log(User.firstNmae, User.lastName, User.email, User.location, User.occupation);
+            console.log(req.body.firstName);
+            return res.status(400).json({ errors });
+        }
+
+        // Insert the new user
+        const result = await collection.insertOne(User);
+        res.status(201).json({ message: "User registered successfully!" });
+    } catch (err) {
+        console.error("Error during registration:", err);
+        res.status(500).json({ error: "Internal server error." });
+    }
+};
+
+
+
 // LOGGIN LOGIC GOES BELOW HERE
-export const login = async (req,res) => {
-    
-}
+export const login = async (req, res, client, dbName) => {
+    try {
+        const { email, password } = req.body;
+
+        // Connect to MongoDB
+        const database = client.db(dbName);
+        const collection = database.collection("Users");
+
+        // Check if the user exists
+        const user = await collection.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ error: "User not found. Please register first." });
+        }
+
+        // Validate password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(400).json({ error: "Invalid email or password." });
+        }
+
+        // Generate a token
+        const token = jwt.sign(
+            { id: user._id, email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+        );
+
+        // Respond with token and user details
+        res.status(200).json({
+            message: "Login successful.",
+            token,
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                picturePath: user.picturePath || "",
+                location: user.location || "",
+                occupation: user.occupation || "",
+                friends: user.friends || [],
+                viewedProfile: user.viewedProfile || 0,
+                impressions: user.impressions || 0,
+            },
+        });
+    } catch (err) {
+        console.error("Error during login:", err);
+        res.status(500).json({ error: "Internal server error." });
+    }
+};
