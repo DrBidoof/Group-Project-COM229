@@ -1,3 +1,4 @@
+import { MongoClient } from "mongodb";
 
 export const getUser = async (req,res,client,dbName) => {
     try{
@@ -36,11 +37,13 @@ export const getUserFriends = async (req, res, client, dbName) => {
 export const addRemoveFriend = async (req, res,client,dbName) => {
     try{
         const {id, friendId } = req.params;
+        //console.log(friendId);
         const db = client.db(dbName);
         const userCollection = db.collection("Users");
-        const currentUser = await userCollection.findOne({ _id: id });
-        const friend = await userCollection.findOne({ _id: friendId });
-
+        const currentUser = await userCollection.findOne({ _id: new ObjectId(id) });
+        console.log(currentUser);
+        const friend = await userCollection.findOne({ _id: new ObjectId(friendId) });
+        console.log(friend);
         if(currentUser.friends.includes(friendId))
         {
             currentUser.friends =  currentUser.friends.filter((id) => id !== friendId);
