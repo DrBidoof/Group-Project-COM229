@@ -68,7 +68,11 @@ export const register = async (req, res, client, dbName) => {
         const database = client.db(dbName);
         const collection = database.collection("Users");
         // logic to check for duplicate emails
-
+        
+        const existingUser = await collection.findOne({ email: User.email });
+        if (existingUser) {
+            return res.status(400).json({ error: "Email already in use." });
+        }
 
         const result = await collection.insertOne(User);
         console.log(`Document inserted with _id: ${result.insertedId}`);
@@ -105,7 +109,7 @@ export const login = async (req, res, client, dbName) => {
                 return res.status(404).json({ error: "User not found. Please register first." });
             }
             // Validate password
-            
+
             const isPasswordValid = await bcrypt.compare(password, user.password);
             if (!isPasswordValid) {
                 return res.status(400).json({ error: "Invalid email or password." });
