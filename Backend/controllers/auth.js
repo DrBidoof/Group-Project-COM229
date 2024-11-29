@@ -3,7 +3,6 @@ import { MongoClient } from "mongodb";
 import jwt from "jsonwebtoken";
 
 
-
 const validateUser = (user) => {
     const errors = [];
     
@@ -41,7 +40,7 @@ const validateUser = (user) => {
     return errors;
 };
 
-/*export const register = async (req, res, client, dbName) => {
+export const register = async (req, res, client, dbName) => {
     try {
         const salt = await bcrypt.genSalt();
         const passwordHash = await bcrypt.hash(req.body.password, salt)
@@ -69,7 +68,12 @@ const validateUser = (user) => {
         const database = client.db(dbName);
         const collection = database.collection("Users");
         // logic to check for duplicate emails
-
+        const existingUser = await collection.findOne({ email: User.email });
+        if (existingUser) {
+            return res.status(400).json({ error: "Email already in use." });
+        }
+        
+        //result 
 
         const result = await collection.insertOne(User);
         console.log(`Document inserted with _id: ${result.insertedId}`);
@@ -80,65 +84,7 @@ const validateUser = (user) => {
     } finally{
        
     }
-};/*
-
-
-/*
-     Check if email already exists
-        const existingUser = await collection.findOne({ email: User.email });
-        if (existingUser) {
-            return res.status(400).json({ error: "Email already in use." });
-        }
-        
-*/
-
-export const register = async (req, res, client, dbName) => {
-    try {
-        const salt = await bcrypt.genSalt();
-        const passwordHash = await bcrypt.hash(req.body.password, salt);
-
-        const User = {
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            password: passwordHash,
-            email: req.body.email,
-            picturePath: req.file ? req.file.filename : "", // Capture the uploaded file's name
-            location: req.body.location || "",
-            occupation: req.body.occupation || "",
-            friends: [],
-            viewedProfile: 0,
-            impressions: 0,
-            createdAt: new Date(),
-        };
-
-        
-        // Connect to MongoDB
-        const database = client.db(dbName);
-        const collection = database.collection("Users");
-
-        // Check if email already exists
-        const existingUser = await collection.findOne({ email: User.email });
-        if (existingUser) {
-            return res.status(400).json({ error: "Email already in use." });
-        }
-
-        //error checking for user object 
-        const errors = validateUser(User);
-        if(errors.length >0){
-            //console.log(User.firstNmae, User.lastName, User.email, User.location, User.occupation);
-            console.log(req.body.firstName);
-            return res.status(400).json({ errors });
-        }
-
-        // Insert the new user
-        const result = await collection.insertOne(User);
-        res.status(201).json({ message: "User registered successfully!" });
-    } catch (err) {
-        console.error("Error during registration:", err);
-        res.status(500).json({ error: "Internal server error." });
-    }
 };
-
 
 
 // LOGGIN LOGIC GOES BELOW HERE
@@ -153,7 +99,7 @@ export const login = async (req, res, client, dbName) => {
         // Check if the user exists
         const user = await collection.findOne({ email });
         if (!user) {
-            return res.status(404).json({ error: "User not found. Please register first." });
+            return res.status(400).json({ error: "Invalid email or password." });
         }
 
         // Validate password
@@ -178,12 +124,12 @@ export const login = async (req, res, client, dbName) => {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
-                picturePath: user.picturePath || "",
-                location: user.location || "",
-                occupation: user.occupation || "",
-                friends: user.friends || [],
-                viewedProfile: user.viewedProfile || 0,
-                impressions: user.impressions || 0,
+                picturePath: user.picturePath,
+                location: user.location,
+                occupation: user.occupation,
+                friends: user.friends,
+                viewedProfile: user.viewedProfile,
+                impressions: user.impressions,
             },
         });
     } catch (err) {
