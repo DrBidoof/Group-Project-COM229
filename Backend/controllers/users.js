@@ -1,12 +1,38 @@
 import { MongoClient } from "mongodb";
 
-export const getUser = async (req,res,client,dbName) => {
-    try{
-            //YOUR LOGIC GOES HERE //client AND dbName is for your connection to mongodb
-    } catch(err){
-        res.status(404).json({ message: err.message });
+
+import { ObjectId } from "mongodb";
+
+export const getUser = async (req, res, client, dbName) => {
+    try {
+        const { id } = req.params;
+
+        console.log("Fetching user with ID:", id);
+
+        // Validate ID format
+        if (!ObjectId.isValid(id)) {
+            console.log("Invalid ID format");
+            return res.status(400).json({ message: "Invalid ID format" });
+        }
+
+        const db = client.db(dbName);
+        const userCollection = db.collection("Users");
+
+        // Find user in the database
+        const user = await userCollection.findOne({ _id: new ObjectId(id) });
+        if (!user) {
+            console.log("User not found in database");
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json(user);
+    } catch (err) {
+        console.error("Error fetching user:", err);
+        res.status(500).json({ message: "Internal server error" });
     }
 };
+
+
 
 export const getUserFriends = async (req, res, client, dbName) => {
     try {
