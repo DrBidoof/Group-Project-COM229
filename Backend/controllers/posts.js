@@ -3,38 +3,45 @@ import { ObjectId } from "mongodb";
 /* Create */
 export const createPost = async (req, res, client, dbName) => {
     try {
-        const post = {
-            userID: req.body.userID,
-            description: req.body.description,
-            picturePath: req.body.picturePath,
-        };
+        // Validate the request body
+        const { userID, description, picturePath } = req.body;
+        if (!userID || !description || !picturePath) {
+            return res.status(400).json({ message: "Invalid input data" });
+        }
+
+        // Convert userID to ObjectId and validate
+        if (!ObjectId.isValid(userID)) {
+            return res.status(400).json({ message: "Invalid user ID format" });
+        }
+        const userIdObjectId = new ObjectId(userID);
 
         const db = client.db(dbName);
         const userCollection = db.collection("Users");
 
-        // Convert userID to ObjectId
-        const userIdObjectId = new ObjectId(post.userID);
-        const currentUser  = await userCollection.findOne({ _id: userIdObjectId });
-
-        if (!currentUser ) {
-            return res.status(404).json({ message: "User  not found" });
+        // Fetch the current user
+        const currentUser = await userCollection.findOne({ _id: userIdObjectId });
+        if (!currentUser) {
+            return res.status(404).json({ message: "User not found" });
         }
 
+        // Prepare the new post
         const newPost = {
-            userID: currentUser ._id,
-            firstName: currentUser .firstName,
-            lastName: currentUser .lastName,
-            location: currentUser .location,
-            description: post.description,
-            picturePath: post.picturePath,
-            userPicturePath: currentUser .userPicturePath,
-            likes: new Map([]), // Initialize as an empty map
+            userID: currentUser._id,
+            firstName: currentUser.firstName,
+            lastName: currentUser.lastName,
+            location: currentUser.location,
+            description,
+            picturePath,
+            userPicturePath: currentUser.userPicturePath,
+            likes: new Map([]), // Initialize as an empty object
             comments: [],
             createdAt: new Date(),
         };
 
         const postCollection = db.collection("Posts");
         const result = await postCollection.insertOne(newPost);
+
+        // Fetch all posts after insertion
         const allPosts = await postCollection.find().toArray();
 
         res.status(201).json({
@@ -42,11 +49,12 @@ export const createPost = async (req, res, client, dbName) => {
             newPostId: result.insertedId,
             allPosts,
         });
-
     } catch (err) {
-        res.status(409).json({ message: err.message });
+        console.error("Error creating post:", err); // Log full error
+        res.status(500).json({ message: "Internal server error" });
     }
 };
+
 
 export const getFeedPosts = async (req,res,client,dbName) =>{
     try{
