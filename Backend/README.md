@@ -102,6 +102,7 @@ Endpoint: GET http://localhost:6001/users/:id
 Replace :id with the actual User ID.
 Requires Bearer Token in the Authorization header.
 ![alt text](R_userDetails.png)
+
 . Get Friends
 
 Endpoint: GET http://localhost:6001/users/:id/friends
