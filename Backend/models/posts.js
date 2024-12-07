@@ -6,7 +6,7 @@ const newPost = {
     description: post.description,
     picturePath: post.picturePath,
     userPicturePath: currentUser.userPicturePath,
-    likes: new Map([]), // Initialize as an empty map
+    likes: {}, // Initialize as an empty map
     comments: [], 
     createdAt: new Date(),
 };

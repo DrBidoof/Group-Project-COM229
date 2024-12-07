@@ -75,7 +75,7 @@ export const getUserPosts = async (req,res,client,dbName) => {
         const { id } = req.params; //id of the post
         const db = client.db(dbName);
         const postCollection = db.collection("Posts");
-        const userPosts = await postCollection.find({_id:id}).toArray();
+        const userPosts = await postCollection.find({ _id: new ObjectId(id) }).toArray();
         res.status(200).json({
             message: "Post fetched successfully",
             userPosts,
