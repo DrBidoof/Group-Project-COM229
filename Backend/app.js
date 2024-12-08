@@ -33,11 +33,11 @@ app.use(bodyParser.json({ limit: "30mb", extended:true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended:true}));
 app.use(
     cors({
-      origin: "https://com229-frontend-y849.onrender.com", // Replace with your frontend URL
+      origin: "https://com229-frontend-y849.onrender.com", // Correct frontend URL
       methods: ["GET", "POST", "PATCH", "DELETE"],
       credentials: true,
     })
-  );
+  );  
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
 /*file storage */
