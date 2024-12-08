@@ -56,7 +56,7 @@ export const createPost = async (req, res, client, dbName) => {
 
 export const getFeedPosts = async (req,res,client,dbName) =>{
     try{
-        const { userId } = req.params;
+        const { id: userId } = req.user;
 
         const db = client.db(dbName);
         const postCollection = db.collection("Posts");
@@ -72,10 +72,10 @@ export const getFeedPosts = async (req,res,client,dbName) =>{
 
 export const getUserPosts = async (req,res,client,dbName) => {
     try{
-        const { id } = req.params; //id of the post
+        const { userId } = req.params; //id of the post
         const db = client.db(dbName);
         const postCollection = db.collection("Posts");
-        const userPosts = await postCollection.find({ _id: new ObjectId(id) }).toArray();
+        const userPosts = await postCollection.find({ userID: new ObjectId(userId) }).toArray();
         res.status(200).json({
             message: "Post fetched successfully",
             userPosts,
