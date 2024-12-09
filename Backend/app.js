@@ -41,24 +41,6 @@ app.use(
   })
 );
 
-// Handle preflight requests
-app.options("*", (req, res) => {
-  res.header("Access-Control-Allow-Origin", "https://com229-frontend-y849.onrender.com");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.sendStatus(200); // Respond OK to OPTIONS requests
-});
-
-// Additional debugging middleware (optional)
-app.use((req, res, next) => {
-  console.log("Request Origin:", req.headers.origin);
-  next();
-});
-
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
 /* File Storage */
