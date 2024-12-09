@@ -32,7 +32,10 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 /* CORS Configuration */
 app.use(
   cors({
-    origin: "https://com229-frontend-y849.onrender.com", // Ensure no trailing slash
+    origin: [
+      "http://localhost:3000", // Allow local frontend
+      "https://com229-frontend-y849.onrender.com" // Render frontend
+    ], // Ensure no trailing slash
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true, // Allow credentials (cookies, headers, etc.)
   })
