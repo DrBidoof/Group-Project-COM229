@@ -54,28 +54,32 @@ export const createPost = async (req, res, client, dbName) => {
     }
 };
 
-export const getFeedPosts = async (req,res,client,dbName) =>{
-    try{
-        const { id: userId } = req.user;
 
+// Get Feed Posts - Fetch posts for the feed (all users)
+export const getFeedPosts = async (req, res, client, dbName) => {
+    try {
         const db = client.db(dbName);
         const postCollection = db.collection("Posts");
-        const allPosts = await postCollection.find({ userID: new ObjectId(userId) }).toArray(); 
-        res.status(201).json({
-            message: "All user post",
+
+        // Fetch all posts from the collection
+        const allPosts = await postCollection.find().toArray();
+
+        res.status(200).json({
+            message: "All posts fetched successfully",
             allPosts,
         });
-    } catch(err){
-        res.status(404).json({ message: err.message }) 
+    } catch (err) {
+        console.error("Error fetching feed posts:", err);
+        res.status(500).json({ message: "Internal Server Error" });
     }
-}
+};
 
 
 
+// Get User Posts - Fetch posts for a specific user
 export const getUserPosts = async (req, res, client, dbName) => {
     try {
         const { userId } = req.params;
-        console.log("Received userId:", userId);
 
         if (!ObjectId.isValid(userId)) {
             return res.status(400).json({ message: "Invalid userId format" });
@@ -84,20 +88,20 @@ export const getUserPosts = async (req, res, client, dbName) => {
         const db = client.db(dbName);
         const postCollection = db.collection("Posts");
 
-        // Query the database for posts with matching userID
-        const userPosts = await postCollection.find({ userID: new ObjectId(userId) }).toArray();
-        console.log("Fetched posts:", userPosts);
+        // Fetch posts for the given userId
+        const userPosts = await postCollection
+            .find({ userID: new ObjectId(userId) })
+            .toArray();
 
         res.status(200).json({
-            message: "Post fetched successfully",
+            message: "User posts fetched successfully",
             userPosts,
         });
     } catch (err) {
         console.error("Error fetching user posts:", err);
-        res.status(404).json({ message: err.message });
+        res.status(500).json({ message: "Internal Server Error" });
     }
 };
-
 
 
 
