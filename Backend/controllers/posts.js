@@ -10,7 +10,7 @@ export const createPost = async (req, res, client, dbName) => {
         }
 
         // Check if a file is uploaded
-        const picturePath = req.file ? req.file.filename : null;
+        const picturePath = req.file ? `/assets/${req.file.filename}` : null;
 
         const db = client.db(dbName);
         const userCollection = db.collection("Users");
@@ -70,20 +70,35 @@ export const getFeedPosts = async (req,res,client,dbName) =>{
     }
 }
 
-export const getUserPosts = async (req,res,client,dbName) => {
-    try{
-        const { userId } = req.params; //id of the post
+
+
+export const getUserPosts = async (req, res, client, dbName) => {
+    try {
+        const { userId } = req.params;
+        console.log("Received userId:", userId);
+
+        if (!ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: "Invalid userId format" });
+        }
+
         const db = client.db(dbName);
         const postCollection = db.collection("Posts");
+
+        // Query the database for posts with matching userID
         const userPosts = await postCollection.find({ userID: new ObjectId(userId) }).toArray();
+        console.log("Fetched posts:", userPosts);
+
         res.status(200).json({
             message: "Post fetched successfully",
             userPosts,
         });
-    } catch(err){
-        res.status(404).json({ message: err.message }) ;
-    };
-}
+    } catch (err) {
+        console.error("Error fetching user posts:", err);
+        res.status(404).json({ message: err.message });
+    }
+};
+
+
 
 
 export const likePosts = async (req, res, client, dbName) => {

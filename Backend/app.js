@@ -23,7 +23,6 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(helmet());
-app.use(helmet.contentSecurityPolicy());
 app.use(helmet({ crossOriginResourcePolicy: false })); // Disable restrictive helmet policy for CORS
 app.use(morgan("common"));
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
