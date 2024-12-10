@@ -44,6 +44,7 @@ export const register = async (req, res, client, dbName) => {
     try {
         const salt = await bcrypt.genSalt();
         const passwordHash = await bcrypt.hash(req.body.password, salt)
+        console.log('Picture Path:', req.body.picturePath);
         const User = {
             firstName: req.body.firstName, 
             lastName: req.body.lastName,
@@ -56,7 +57,9 @@ export const register = async (req, res, client, dbName) => {
             viewedProfile: 0,
             impressions: 0,
             createdAt:new Date(),
+            
         }
+        console.log('Picture Path:', req.body.picturePath);
         //error checking for user object 
         const errors = validateUser(User);
         if(errors.length >0){
