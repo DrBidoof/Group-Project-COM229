@@ -22,8 +22,6 @@ const __dirname = path.dirname(__filename);
 dotenv.config();
 const app = express();
 app.use(express.json());
-app.use(helmet());
-app.use(helmet({ crossOriginResourcePolicy: false })); // Disable restrictive helmet policy for CORS
 app.use(morgan("common"));
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
@@ -31,15 +29,28 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 /* CORS Configuration */
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000", // Allow local frontend
-      "https://com229-frontend-y849.onrender.com" // Render frontend
-    ], // Ensure no trailing slash
+    origin: (origin, callback) => {
+      const allowedOrigins = ["http://localhost:3000", "https://com229-frontend-y849.onrender.com"];
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "PATCH", "DELETE"],
-    credentials: true, // Allow credentials (cookies, headers, etc.)
+    credentials: true,
   })
 );
 
+/* Handle Preflight Requests */
+app.options("*", (req, res) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin);
+  res.header("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.sendStatus(200);
+});
+
+/* Static Files */
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
 /* File Storage */

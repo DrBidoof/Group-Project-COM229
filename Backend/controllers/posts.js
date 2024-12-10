@@ -11,6 +11,8 @@ export const createPost = async (req, res, client, dbName) => {
 
         // Check if a file is uploaded
         const picturePath = req.file ? `/assets/${req.file.filename}` : null;
+        console.log("File uploaded to:", picturePath); // Log the file path
+        console.log("Request Body:", req.body);
 
         const db = client.db(dbName);
         const userCollection = db.collection("Users");
