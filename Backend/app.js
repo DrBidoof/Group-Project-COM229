@@ -91,7 +91,3 @@ app.post("/posts", verifyToken, upload.single("picture"), (req, res) => {
 app.use("/auth", authRoutes(client, dbName));
 app.use("/users", userRoutes(client, dbName));
 app.use("/posts", postRoutes(client, dbName));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/index.html"));
-});
