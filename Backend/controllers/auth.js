@@ -43,50 +43,54 @@ const validateUser = (user) => {
 export const register = async (req, res, client, dbName) => {
     try {
         const salt = await bcrypt.genSalt();
-        const passwordHash = await bcrypt.hash(req.body.password, salt)
-        console.log('Picture Path:', req.body.picturePath);
+        const passwordHash = await bcrypt.hash(req.body.password, salt);
+
+        // Log for debugging
+        console.log('Received File:', req.file);
+        console.log('Received Body:', req.body);
+
         const User = {
-            firstName: req.body.firstName, 
+            firstName: req.body.firstName,
             lastName: req.body.lastName,
             password: passwordHash,
-            email:req.body.email,
-            picturePath:req.body.picturePath,
-            location:req.body.location,
-            occupation:req.body.occupation,
-            friends:[],
+            email: req.body.email,
+            picturePath: req.file ? `/assets/${req.file.filename}` : null, // Assign from req.file
+            location: req.body.location,
+            occupation: req.body.occupation,
+            friends: [],
             viewedProfile: 0,
             impressions: 0,
-            createdAt:new Date(),
-            
-        }
-        console.log('Picture Path:', req.body.picturePath);
-        //error checking for user object 
+            createdAt: new Date(),
+        };
+
+        console.log('Picture Path:', User.picturePath); // This should now show the correct path
+
+        // Error checking for user object
         const errors = validateUser(User);
-        if(errors.length >0){
-            //console.log(User.firstNmae, User.lastName, User.email, User.location, User.occupation);
-            console.log(req.body.firstName);
+        if (errors.length > 0) {
             return res.status(400).json({ errors });
         }
-        // connectiong to mongo db
+
+        // Connecting to MongoDB
         const database = client.db(dbName);
         const collection = database.collection("Users");
-        // logic to check for duplicate emails
-        
+
+        // Check for duplicate email
         const existingUser = await collection.findOne({ email: User.email });
         if (existingUser) {
             return res.status(400).json({ error: "Email already in use." });
         }
 
+        // Insert user into database
         const result = await collection.insertOne(User);
         console.log(`Document inserted with _id: ${result.insertedId}`);
-        res.status(201).json({ message: "User registered successfully!"});
-    } catch(err) {
+        res.status(201).json({ message: "User registered successfully!" });
+    } catch (err) {
         console.error("Error inserting document:", err);
-        res.status(500).json({error: "Internal server error."});
-    } finally{
-       
+        res.status(500).json({ error: "Internal server error." });
     }
 };
+
 
 
 /*
