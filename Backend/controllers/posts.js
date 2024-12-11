@@ -42,7 +42,7 @@ export const createPost = async (req, res, client, dbName) => {
 
         // Fetch all posts to return
         const allPosts = await postCollection.find().toArray();
-
+            console.log(allPosts);
         res.status(201).json({
             message: "Post created successfully",
             newPostId: result.insertedId,
