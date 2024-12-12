@@ -60,7 +60,7 @@ export const getFeedPosts = async (req,res,client,dbName) =>{
 
         const db = client.db(dbName);
         const postCollection = db.collection("Posts");
-        const allPosts = await postCollection.find({ userID: new ObjectId(userId) }).toArray(); 
+        const allPosts = await postCollection.find({}).toArray(); 
         res.status(201).json({
             message: "All user post",
             allPosts,
